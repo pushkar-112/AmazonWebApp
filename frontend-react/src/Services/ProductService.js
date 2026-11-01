@@ -31,3 +31,15 @@ export async function createProduct(product) {
 
   return response.json()
 }
+
+// Fetch a single product by its ID from the backend.
+// This is used on the Product Details page.
+export async function getProductById(id) {
+  const response = await fetch(BASE_URL + 'product/' + id)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch product details')
+  }
+
+  return response.json()
+}

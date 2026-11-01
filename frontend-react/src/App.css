@@ -73,6 +73,16 @@ input {
   color: #dfe6eb;
 }
 
+.nav-links a {
+  color: #dfe6eb;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--amazon-gold);
+}
+
 .nav-links span {
   cursor: pointer;
   transition: color 0.2s ease;
