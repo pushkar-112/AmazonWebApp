@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react'
 import './App.css'
-import Navbar from './Navbar.jsx'
-import Product from './Product.jsx'
+import Navbar from './Components/Navbar.jsx'
+import Product from './Components/Product.jsx'
+import {createProduct, getAllProducts} from "./Services/ProductService.js";
 
 function App() {
   // ---------------------------
@@ -59,11 +60,15 @@ function App() {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
 
+  // Load all products when the page first opens.
+  useEffect(() => {
+    getProducts()
+  }, [])
+
+  // This function fetches all products from the backend and stores them in state.
   async function getProducts() {
     try {
-      // GET request to retrieve all products from the backend
-      const response = await fetch('http://localhost:8080/products')
-      const data = await response.json()
+      const data = await getAllProducts()
       setProducts(data)
       console.log('Products:', data)
     } catch (error) {
@@ -71,32 +76,9 @@ function App() {
     }
   }
 
-  async function addProduct(product) {
-    try {
-      // POST request to send a new product to the backend
-      const response = await fetch('http://localhost:8080/addProduct', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(product),
-      })
-
-      const data = await response.json()
-      console.log('Product added:', data)
-      return data
-    } catch (error) {
-      console.error('Error adding product:', error)
-    }
-  }
-
-  // Load all products when the page first opens.
-  useEffect(() => {
-    getProducts()
-  }, [])
-
+  // This function handles the form submission for adding a new product.
   async function handleSubmit() {
-      // This function creates a product object from the input fields.
+    // This function creates a product object from the input fields.
     // Then it sends it to the backend and refreshes the list.
     const product = {
       prodName: name,
@@ -104,56 +86,88 @@ function App() {
     }
 
     await addProduct(product)
-        setName('')
-        setPrice('')
+    setName('')
+    setPrice('')
+    await getProducts()
+  }
 
-        // refresh the product list after adding a new product
-        await getProducts()
+  // This function sends a new product to the backend and logs the response.
+  async function addProduct(product) {
+    try {
+      const data = await createProduct(product)
+      console.log('Product added:', data)
+      return data
+    } catch (error) {
+      console.error('Error adding product:', error)
+    }
   }
 
   return (
-    <div>
+    <div className="app-shell">
       <Navbar />
 
-      <h1>Add Product</h1>
+      <main className="page-container">
+        <section className="form-panel">
+          <h1>Add Product</h1>
 
-      <input
-        placeholder="Product Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+          <div className="product-form">
+            <input
+              className="text-input"
+              placeholder="Product Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-      <input
-        placeholder="Product Price"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
+            <input
+              className="text-input"
+              placeholder="Product Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
 
-      <button onClick={handleSubmit}>Add Product</button>
+            <button className="primary-button" onClick={handleSubmit}>
+              Add Product
+            </button>
+          </div>
+        </section>
 
-      {/* Render each product as a Product card */}
-      {products.map((product) => (
-        <Product
-          key={product.prodId} // Unique ID from database, required for React lists
-          name={product.prodName}
-          price={product.price}
-        />
-      ))}
+        <section className="products-panel">
+          <h1>Product List</h1>
 
-      <hr />
-      <h2>PLAYGROUND BELOW</h2>
-      <hr />
+          <div className="product-list">
+            {products.map((product) => (
+              <Product
+                key={product.prodId}
+                name={product.prodName}
+                price={product.price}
+              />
+            ))}
+          </div>
+        </section>
 
-      <p>Refresh to generate random number</p>
-      <h2>Random Number - {counter}</h2>
+        <section className="demo-panel">
+          <h2>Playground</h2>
 
-      <button onClick={incrementCounter}>Click me to increment number</button>
-      <button onClick={decrementCounter}>Click me to decrement number</button>
+          <p>Refresh to generate random number</p>
+          <div className="counter-box">Random Number - {counter}</div>
 
-      <h2>Spring Boot API</h2>
-      <button onClick={fetchMessage}>Call Spring Boot API</button>
+          <div className="demo-buttons">
+            <button className="primary-button" onClick={incrementCounter}>
+              Increment
+            </button>
+            <button className="secondary-button" onClick={decrementCounter}>
+              Decrement
+            </button>
+          </div>
 
-      <h2>{message}</h2>
+          <h2>Spring Boot API</h2>
+          <button className="secondary-button" onClick={fetchMessage}>
+            Call Spring Boot API
+          </button>
+
+          <div className="api-box">{message}</div>
+        </section>
+      </main>
     </div>
   )
 }
