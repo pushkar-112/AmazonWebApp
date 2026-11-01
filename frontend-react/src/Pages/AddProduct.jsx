@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { createProduct, getAllProducts } from '../Services/ProductService.js'
+import { useNavigate } from 'react-router-dom'
+import { createProduct } from '../Services/ProductService.js'
 
 function AddProduct() {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('')
+  const navigate = useNavigate()
 
   async function handleSubmit() {
     const product = {
@@ -15,8 +17,7 @@ function AddProduct() {
       await createProduct(product)
       setName('')
       setPrice('')
-      await getAllProducts()
-      alert('Product added successfully!')
+      navigate('/')
     } catch (error) {
       console.error('Error adding product:', error)
     }

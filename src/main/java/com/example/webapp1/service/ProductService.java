@@ -25,9 +25,8 @@ public class ProductService {
                         new RuntimeException("Product not found"));
     }
 
-    public String addProduct(Product product){
+    public Product addProduct(Product product){
         productRepository.save(product);
-        return "Product " + product.getProdName()
-                + " added successfully.";
+        return product;
     }
 }
